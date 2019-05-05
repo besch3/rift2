@@ -44,7 +44,11 @@ class Map:
     def move(self):
         moves = ""
         for p in self.pods:
-            moves += p.move(self.map_graph)
+            for z_id in self.map_graph[p.z_id]:
+                if self.zones[z_id].owner_id != self.my_id and p.count > 0:
+                    moves += p.move_target(z_id)
+                    p.count -= 1
+            moves += p.move_explore(self.map_graph)
         return moves
 
         
@@ -55,11 +59,16 @@ class Pod:
         self.strength_delta = strength_delta
         
     def move_explore(self, graph): #simple random moves
-        z = random.choice(graph[self.z_id])
-        return str(self.count) + " " + str(self.z_id) + " " + str(z) + " "
+        moves = ""
+        for i in range(self.count):
+            z = random.choice(graph[self.z_id])
+            moves += str(1) + " " + str(self.z_id) + " " + str(z) + " "
+        return moves
+        #z = random.choice(graph[self.z_id])
+        #return str(self.count) + " " + str(self.z_id) + " " + str(z) + " "
     
-    def move_target(self, zone):
-        pass #move towards, target zone
+    def move_target(self, z_id):
+        return str(1) + " " + str(self.z_id) + " " + str(z_id) + " "
     
     def move(self, graph):
         if 1: #decision logic needs improvement
@@ -108,9 +117,8 @@ while True:
         # platinum: the amount of Platinum this zone can provide (0 if hidden by fog)
         z_id, owner_id, pods_p0, pods_p1, visible, platinum = [int(j) for j in input().split()]
         map_z.update(z_id, owner_id, pods_p0, pods_p1, visible, platinum)
-    # Write an action using print
+    # Write an action using printgoogle crome rechtreisdsd
     # To debug: print("Debug messages...", file=sys.stderr)
-    print(map_z.pods, file=sys.stderr)
 
     # first line for movement commands, second line no longer used (see the protocol in the statement for details)
     print(map_z.move())
